@@ -5,14 +5,38 @@ import { useState, useEffect } from 'react';
 import type { EfectoSecundario } from '@/lib/types';
 
 const TIPOS_EFECTOS = [
-  'Náuseas', 'Vómitos', 'Diarrea', 'Estreñimiento', 'Dolor abdominal',
-  'Fatiga', 'Dolor de cabeza', 'Mareos', 'Reacción en sitio de inyección', 'Otro',
+  'Náuseas',
+  'Vómitos',
+  'Diarrea',
+  'Constipación',
+  'Reflujo',
+  'Dolor abdominal',
+  'Fatiga',
+  'Otro',
 ];
+
+function severidadLabel(v: number) {
+  if (v === 0) return 'Nada';
+  if (v <= 2) return 'Muy poco';
+  if (v <= 4) return 'Poco';
+  if (v <= 6) return 'Bastante';
+  if (v <= 8) return 'Mucho';
+  return 'Muy mal';
+}
+
+function severidadColor(v: number) {
+  if (v === 0) return 'bg-gray-100 text-gray-600';
+  if (v <= 2) return 'bg-green-100 text-green-700';
+  if (v <= 4) return 'bg-yellow-100 text-yellow-700';
+  if (v <= 6) return 'bg-orange-100 text-orange-700';
+  if (v <= 8) return 'bg-red-100 text-red-700';
+  return 'bg-red-200 text-red-800';
+}
 
 export default function EfectosPage() {
   const supabase = createClient();
   const [tipo, setTipo] = useState(TIPOS_EFECTOS[0]);
-  const [severidad, setSeveridad] = useState<1 | 2 | 3 | 4 | 5>(1);
+  const [severidad, setSeveridad] = useState(0);
   const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0]);
   const [descripcion, setDescripcion] = useState('');
   const [efectos, setEfectos] = useState<EfectoSecundario[]>([]);
@@ -68,26 +92,24 @@ export default function EfectosPage() {
 
     setEfectos(data ?? []);
     setDescripcion('');
+    setSeveridad(0);
     setSuccess(true);
     setTimeout(() => setSuccess(false), 3000);
     setLoading(false);
   }
 
-  const severidadLabel = ['', 'Leve', 'Leve-moderado', 'Moderado', 'Moderado-severo', 'Severo'];
-  const severidadColor = ['', 'bg-green-100 text-green-700', 'bg-yellow-100 text-yellow-700', 'bg-orange-100 text-orange-700', 'bg-red-100 text-red-700', 'bg-red-200 text-red-800'];
-
   return (
     <div className="space-y-8">
-      <h1 className="text-2xl font-bold text-gray-900">Efectos secundarios</h1>
+      <h1 className="text-2xl font-bold text-gray-900">¿Cómo me siento?</h1>
 
-      <form onSubmit={handleSubmit} className="bg-white shadow rounded-lg p-6 space-y-4">
+      <form onSubmit={handleSubmit} className="bg-white shadow rounded-lg p-6 space-y-5">
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de efecto</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">¿Qué sentiste?</label>
             <select
               value={tipo}
               onChange={(e) => setTipo(e.target.value)}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400"
             >
               {TIPOS_EFECTOS.map((t) => (
                 <option key={t} value={t}>{t}</option>
@@ -101,43 +123,47 @@ export default function EfectosPage() {
               required
               value={fecha}
               onChange={(e) => setFecha(e.target.value)}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400"
             />
           </div>
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Severidad: <span className={`px-2 py-0.5 rounded text-xs font-medium ${severidadColor[severidad]}`}>{severidadLabel[severidad]}</span>
+            ¿Cuánto te molestó?{' '}
+            <span className={`ml-1 px-2 py-0.5 rounded text-xs font-semibold ${severidadColor(severidad)}`}>
+              {severidad} — {severidadLabel(severidad)}
+            </span>
           </label>
           <input
             type="range"
-            min={1}
-            max={5}
+            min={0}
+            max={10}
             value={severidad}
-            onChange={(e) => setSeveridad(parseInt(e.target.value) as 1|2|3|4|5)}
-            className="w-full"
+            onChange={(e) => setSeveridad(parseInt(e.target.value))}
+            className="w-full accent-orange-500"
           />
           <div className="flex justify-between text-xs text-gray-400 mt-1">
-            <span>1 - Leve</span>
-            <span>5 - Severo</span>
+            <span>0 — Nada</span>
+            <span>5 — Bastante</span>
+            <span>10 — Muy mal</span>
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Descripción (opcional)</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Contanos más (opcional)</label>
           <textarea
             value={descripcion}
             onChange={(e) => setDescripcion(e.target.value)}
             rows={3}
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-            placeholder="Describí cómo te sentiste..."
+            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400"
+            placeholder="Ej: me pasó después de comer, duró unas horas..."
           />
         </div>
 
         {success && (
           <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-2 rounded text-sm">
-            Efecto registrado correctamente.
+            Registrado correctamente.
           </div>
         )}
 
@@ -146,7 +172,7 @@ export default function EfectosPage() {
           disabled={loading}
           className="w-full bg-orange-500 text-white py-2 px-4 rounded-md hover:bg-orange-600 disabled:opacity-50 font-medium"
         >
-          {loading ? 'Guardando...' : 'Registrar efecto'}
+          {loading ? 'Guardando...' : 'Guardar'}
         </button>
       </form>
 
@@ -161,8 +187,8 @@ export default function EfectosPage() {
                   <p className="text-sm text-gray-500">{new Date(e.fecha).toLocaleDateString('es-AR')}</p>
                   {e.descripcion && <p className="text-sm text-gray-600 mt-1">{e.descripcion}</p>}
                 </div>
-                <span className={`text-xs px-2 py-1 rounded font-medium ${severidadColor[e.severidad]}`}>
-                  {severidadLabel[e.severidad]}
+                <span className={`text-xs px-2 py-1 rounded font-medium ${severidadColor(e.severidad)}`}>
+                  {e.severidad}/10 — {severidadLabel(e.severidad)}
                 </span>
               </div>
             ))}

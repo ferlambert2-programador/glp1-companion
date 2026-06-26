@@ -6,11 +6,12 @@ import { useRouter } from 'next/navigation';
 
 interface Props {
   token: string;
+  pacienteId: string;
   emailPaciente: string;
   nombrePaciente: string;
 }
 
-export default function UnirseForm({ token, emailPaciente, nombrePaciente }: Props) {
+export default function UnirseForm({ token, pacienteId, emailPaciente, nombrePaciente }: Props) {
   const router = useRouter();
   const supabase = createClient();
   const [password, setPassword] = useState('');
@@ -41,6 +42,18 @@ export default function UnirseForm({ token, emailPaciente, nombrePaciente }: Pro
 
     if (signUpError) {
       setError(signUpError.message);
+      setLoading(false);
+      return;
+    }
+
+    // Link the pre-created pacientes record to the new user profile
+    const { error: linkError } = await supabase.rpc('link_patient_profile', {
+      p_token: token,
+      p_paciente_id: pacienteId,
+    });
+
+    if (linkError) {
+      setError('Error al vincular tu cuenta. Contactá a tu médico.');
       setLoading(false);
       return;
     }
