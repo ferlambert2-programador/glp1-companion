@@ -22,13 +22,19 @@ export default async function MedicoPacientePage({ params }: Props) {
 
   if (!paciente) notFound();
 
-  const [{ data: pesos }, { data: dosis }, { data: efectos }, { data: tratamiento }] =
+  const [{ data: pesos }, { data: ultimosPesos }, { data: dosis }, { data: efectos }, { data: tratamiento }] =
     await Promise.all([
       supabase
         .from('registros_peso')
         .select('*')
         .eq('paciente_id', params.id)
         .order('fecha', { ascending: true }),
+      supabase
+        .from('registros_peso')
+        .select('peso_kg, fecha, nota')
+        .eq('paciente_id', params.id)
+        .order('fecha', { ascending: false })
+        .limit(5),
       supabase
         .from('registros_dosis')
         .select('*')
@@ -49,8 +55,22 @@ export default async function MedicoPacientePage({ params }: Props) {
         .single(),
     ]);
 
-  const severidadLabel = ['', 'Leve', 'Leve-mod.', 'Moderado', 'Mod.-severo', 'Severo'];
-  const severidadColor = ['', 'text-green-600', 'text-yellow-600', 'text-orange-600', 'text-red-600', 'text-red-800'];
+  function severidadLabel(v: number) {
+    if (v === 0) return 'Nada';
+    if (v <= 2) return 'Muy poco';
+    if (v <= 4) return 'Poco';
+    if (v <= 6) return 'Bastante';
+    if (v <= 8) return 'Mucho';
+    return 'Muy mal';
+  }
+  function severidadColor(v: number) {
+    if (v === 0) return 'text-gray-500';
+    if (v <= 2) return 'text-green-600';
+    if (v <= 4) return 'text-yellow-600';
+    if (v <= 6) return 'text-orange-600';
+    if (v <= 8) return 'text-red-600';
+    return 'text-red-800';
+  }
 
   return (
     <div className="space-y-8">
@@ -106,7 +126,23 @@ export default async function MedicoPacientePage({ params }: Props) {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-white rounded-lg shadow p-5">
+          <h2 className="text-lg font-semibold text-gray-800 mb-3">Últimos pesos</h2>
+          {ultimosPesos && ultimosPesos.length > 0 ? (
+            <div className="space-y-2">
+              {ultimosPesos.map((p, i) => (
+                <div key={i} className="flex justify-between py-1 border-b border-gray-100 last:border-0 text-sm">
+                  <span className="font-medium text-gray-800">{p.peso_kg} kg</span>
+                  <span className="text-gray-400">{new Date(p.fecha).toLocaleDateString('es-AR')}</span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-gray-400">Sin registros de peso.</p>
+          )}
+        </div>
+
         <div className="bg-white rounded-lg shadow p-5">
           <h2 className="text-lg font-semibold text-gray-800 mb-3">Últimas dosis</h2>
           {dosis && dosis.length > 0 ? (
@@ -130,8 +166,8 @@ export default async function MedicoPacientePage({ params }: Props) {
               {efectos.map((e) => (
                 <div key={e.id} className="flex justify-between py-1 border-b border-gray-100 last:border-0 text-sm">
                   <span className="text-gray-700">{e.tipo}</span>
-                  <span className={`font-medium ${severidadColor[e.severidad]}`}>
-                    {severidadLabel[e.severidad]}
+                  <span className={`font-medium ${severidadColor(e.severidad)}`}>
+                    {e.severidad}/10 — {severidadLabel(e.severidad)}
                   </span>
                 </div>
               ))}

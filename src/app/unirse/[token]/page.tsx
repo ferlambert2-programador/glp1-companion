@@ -41,6 +41,7 @@ export default async function UnirsePage({ params }: Props) {
         </div>
         <UnirseForm
           token={params.token}
+          pacienteId={invite.paciente_id}
           emailPaciente={invite.email_paciente}
           nombrePaciente={(invite.pacientes as { nombre: string })?.nombre}
         />

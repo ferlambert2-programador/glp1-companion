@@ -43,7 +43,7 @@ export interface EfectoSecundario {
   id: string;
   paciente_id: string;
   tipo: string;
-  severidad: 1 | 2 | 3 | 4 | 5;
+  severidad: number; // 0-10
   fecha: string;
   descripcion: string | null;
   created_at: string;
