@@ -42,15 +42,21 @@ export default function PesoPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!pacienteId) return;
+    if (!pacienteId) { alert("No se encontro tu perfil de paciente vinculado."); return; }
     setLoading(true);
 
-    await supabase.from('registros_peso').insert({
+    const { error: insertError } = await supabase.from('registros_peso').insert({
       paciente_id: pacienteId,
       peso_kg: parseFloat(pesoKg),
       fecha,
       nota: nota || null,
     });
+
+    if (insertError) {
+      alert('Error al guardar: ' + insertError.message);
+      setLoading(false);
+      return;
+    }
 
     const { data } = await supabase
       .from('registros_peso')
