@@ -17,6 +17,7 @@ export default async function UnirsePage({ params }: Props) {
     .single();
 
   if (!invite) notFound();
+  console.log("DEBUG invite:", JSON.stringify(invite));
 
   const expired = new Date(invite.expires_at) < new Date();
   if (expired) {
