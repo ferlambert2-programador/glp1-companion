@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import NuevoPacienteForm from './NuevoPacienteForm';
-import PacienteAcciones from "./PacienteAcciones";
+import PacienteAcciones from './PacienteAcciones';
 
 export default async function MedicoPage() {
   const supabase = createClient();
@@ -19,7 +19,7 @@ export default async function MedicoPage() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Mis pacientes</h1>
-        <NuevoPacienteForm medicoId={user!.id} />
+          <NuevoPacienteForm medicoId={user!.id} />
       </div>
 
       {pacientes && pacientes.length > 0 ? (
@@ -27,18 +27,19 @@ export default async function MedicoPage() {
           {pacientes.map((p) => (
             <div key={p.id}>
               <Link
-              href={`/medico/paciente/${p.id}`}
-              className="bg-white rounded-lg shadow p-5 hover:shadow-md transition-shadow"
-            >
-              <p className="font-semibold text-gray-900">{p.nombre}</p>
-              <p className="text-sm text-gray-500 mt-1">{p.email}</p>
-              {p.fecha_inicio_tratamiento && (
-                <p className="text-xs text-gray-400 mt-2">
-                  Inicio: {new Date(p.fecha_inicio_tratamiento).toLocaleDateString('es-AR')}
-                </p>
-              )}
-            </Link>
+                href={`/medico/paciente/${p.id}`}
+                className="bg-white rounded-lg shadow p-5 hover:shadow-md transition-shadow"
+              >
+                <p className="font-semibold text-gray-900">{p.nombre}</p>
+                <p className="text-sm text-gray-500 mt-1">{p.email}</p>
+                {p.fecha_inicio_tratamiento && (
+                  <p className="text-xs text-gray-400 mt-2">
+                    Inicio: {new Date(p.fecha_inicio_tratamiento).toLocaleDateString('es-AR')}
+                  </p>
+                )}
+              </Link>
               <PacienteAcciones pacienteId={p.id} nombre={p.nombre} email={p.email} />
+            </div>
           ))}
         </div>
       ) : (
