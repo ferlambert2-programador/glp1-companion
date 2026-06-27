@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/client';
 import { useState, useEffect } from 'react';
 import type { RegistroDosis } from '@/lib/types';
 
-const MEDICAMENTOS = ['Semaglutida (Ozempic)', 'Semaglutida (Wegovy)', 'Liraglutida (Victoza)', 'Dulaglutida (Trulicity)', 'Tirzepatida (Mounjaro)'];
+const MEDICAMENTOS = ['Semaglutida (Obetide)', 'Semaglutida (Dutide)', 'Liraglutida (Victoza)', 'Dulaglutida (Trulicity)', 'Tirzepatida (Mounjaro)'];
 
 export default function DosisPage() {
   const supabase = createClient();

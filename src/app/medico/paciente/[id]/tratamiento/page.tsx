@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
-const MEDICAMENTOS = ['Semaglutida (Ozempic)', 'Semaglutida (Wegovy)', 'Liraglutida (Victoza)', 'Dulaglutida (Trulicity)', 'Tirzepatida (Mounjaro)'];
+const MEDICAMENTOS = ['Semaglutida (Obetide)', 'Semaglutida (Dutide)', 'Liraglutida (Victoza)', 'Dulaglutida (Trulicity)', 'Tirzepatida (Mounjaro)'];
 
 interface Props {
   params: { id: string };

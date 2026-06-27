@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import NuevoPacienteForm from './NuevoPacienteForm';
+import PacienteAcciones from "./PacienteAcciones";
 
 export default async function MedicoPage() {
   const supabase = createClient();
@@ -24,8 +25,8 @@ export default async function MedicoPage() {
       {pacientes && pacientes.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {pacientes.map((p) => (
-            <Link
-              key={p.id}
+            <div key={p.id}>
+              <Link
               href={`/medico/paciente/${p.id}`}
               className="bg-white rounded-lg shadow p-5 hover:shadow-md transition-shadow"
             >
@@ -37,6 +38,7 @@ export default async function MedicoPage() {
                 </p>
               )}
             </Link>
+              <PacienteAcciones pacienteId={p.id} nombre={p.nombre} email={p.email} />
           ))}
         </div>
       ) : (
